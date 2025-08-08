@@ -5,10 +5,18 @@
  */
 
 const { Command } = require('commander');
-const inquirer = require('inquirer');
 const fs = require('fs').promises;
 const path = require('path');
 const { spawn } = require('child_process');
+
+// Dynamic import for inquirer (ES modules)
+let inquirer;
+async function getInquirer() {
+    if (!inquirer) {
+        inquirer = await import('inquirer');
+    }
+    return inquirer.default;
+}
 
 const program = new Command();
 
@@ -105,6 +113,8 @@ class BlogCLI {
     }
 
     async interactiveGeneration() {
+        const inquirerInstance = await getInquirer();
+        
         const questions = [
             {
                 type: 'input',
@@ -144,7 +154,7 @@ class BlogCLI {
             }
         ];
 
-        const answers = await inquirer.prompt(questions);
+        const answers = await inquirerInstance.prompt(questions);
         
         if (!answers.confirm) {
             console.log('❌ Generation cancelled');
@@ -220,6 +230,8 @@ class BlogCLI {
     async setup() {
         console.log('⚙️  Blog Setup\n');
 
+        const inquirerInstance = await getInquirer();
+        
         const questions = [
             {
                 type: 'input',
@@ -239,7 +251,7 @@ class BlogCLI {
             }
         ];
 
-        const answers = await inquirer.prompt(questions);
+        const answers = await inquirerInstance.prompt(questions);
 
         // Create .env file
         const envContent = `# Korean Travel Blog Configuration
