@@ -1,0 +1,81 @@
+name: Auto Generate Blog Post
+
+on:
+  workflow_dispatch:
+    inputs:
+      photos_directory:
+        description: 'Path to photos directory (relative to repo root)'
+        required: true
+        default: 'photos/new-location'
+      location_name:
+        description: 'Location name for the blog post'
+        required: true
+        default: 'Seoul Adventure'
+      post_type:
+        description: 'Type of post'
+        required: false
+        default: 'travel-guide'
+        type: choice
+        options:
+        - travel-guide
+        - food-experience
+        - cultural-experience
+        - hiking-adventure
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Python dependencies
+      run: |
+        pip install pillow exifread openai python-dotenv
+        
+    - name: Generate blog post
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        PHOTOS_DIR: ${{ github.event.inputs.photos_directory }}
+        LOCATION_NAME: ${{ github.event.inputs.location_name }}
+        POST_TYPE: ${{ github.event.inputs.post_type }}
+      run: |
+        python scripts/generate-post.py
+        
+    - name: Process and optimize images
+      run: |
+        node scripts/process-images.js "${{ github.event.inputs.photos_directory }}"
+        
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'Add new blog post: ${{ github.event.inputs.location_name }}'
+        title: 'New Blog Post: ${{ github.event.inputs.location_name }}'
+        body: |
+          🤖 **Auto-generated blog post**
+          
+          **Location:** ${{ github.event.inputs.location_name }}
+          **Post Type:** ${{ github.event.inputs.post_type }}
+          **Photos Directory:** ${{ github.event.inputs.photos_directory }}
+          
+          This post was automatically generated from the provided photos using AI.
+          Please review the content and images before merging.
+          
+        branch: auto-post/${{ github.event.inputs.location_name }}
+        delete-branch: true

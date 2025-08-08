@@ -1,0 +1,12 @@
+# Images folder
+Place your blog post images in this directory.
+
+## Recommended structure:
+- `/images/posts/` - Blog post images
+- `/images/covers/` - Cover images for posts
+- `/images/gallery/` - Photo galleries
+
+## Image optimization tips:
+- Use WebP format when possible for better compression
+- Resize images to appropriate dimensions (max 1920px width for covers)
+- Compress images before uploading to improve page load speed

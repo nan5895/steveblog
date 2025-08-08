@@ -1,0 +1,42 @@
+{
+  "name": "korean-travel-blog",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "blog-cli": "./scripts/blog-cli.js"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate-post": "node scripts/blog-cli.js generate",
+    "blog": "node scripts/blog-cli.js"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "gray-matter": "^4.0.3",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "sharp": "^0.33.0"
+  },
+  "optionalDependencies": {
+    "python-shell": "^5.0.0"
+  }
+}
