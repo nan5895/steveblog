@@ -133,8 +133,8 @@ class BlogPostGenerator:
         
         try:
             message = self.claude_client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=3000,
+                model="claude-3-5-sonnet-20241022",  # Latest vision-capable model
+                max_tokens=4000,
                 messages=[
                     {
                         "role": "user",
@@ -176,41 +176,70 @@ class BlogPostGenerator:
         """Generate the actual blog post content."""
         
         prompt = f"""
-        Write a detailed travel blog post about {self.location_name} in South Korea.
+        You are an experienced Korean travel blogger who creates authentic, engaging, and highly informative travel content. Write a detailed travel blog post about {self.location_name} in South Korea.
         
-        Use this analysis data: {json.dumps(analysis, indent=2)}
+        Use this detailed analysis from my photos: {json.dumps(analysis, indent=2)}
         
         Post type: {self.post_type}
         
-        Requirements:
-        1. Write in first person as a travel blogger
-        2. Include practical travel tips and information
-        3. Make it engaging and personal
-        4. Include Korean names with English translations
-        5. Add specific details about transportation, costs, timing
-        6. Include cultural context and historical background
-        7. Structure with clear headings and sections
-        8. Add photo placement suggestions as comments
-        9. Include SEO-friendly content
-        10. End with practical tips section
+        WRITING STYLE REQUIREMENTS:
+        • Write in first person with authentic, personal experiences
+        • Use storytelling techniques to make it engaging and memorable  
+        • Include sensory descriptions (what I saw, heard, smelled, tasted)
+        • Add genuine emotions and personal reactions to create connection
+        • Balance practical information with inspiring narrative
+        • Use varied sentence structures and compelling transitions
         
-        Format as markdown with proper frontmatter:
-        - Use engaging title
-        - Include excerpt
-        - Add relevant tags
-        - Set appropriate date
-        - Suggest cover image
+        CONTENT REQUIREMENTS:
+        • Korean names with proper romanization and English translations (한글/Hangul)
+        • Specific transportation details (subway lines, bus numbers, walking times)
+        • Real cost estimates in KRW and USD 
+        • Best times to visit (season, time of day, avoiding crowds)
+        • Cultural context explaining WHY things are significant
+        • Historical background that adds depth
+        • Local etiquette and customs visitors should know
+        • Food recommendations with descriptions and where to find them
+        • Photography tips for each location
+        • Hidden gems and local secrets
+        • Common mistakes to avoid
         
-        Make it approximately 1500-2000 words and very informative for travelers.
+        STRUCTURE:
+        • Engaging introduction with a hook
+        • Clear section headings with emojis
+        • Logical flow from arrival to departure
+        • Photo placement suggestions as HTML comments
+        • Practical "Planning Your Visit" section
+        • Call-to-action ending encouraging engagement
+        
+        FORMAT: Markdown with frontmatter including:
+        • Compelling, SEO-optimized title
+        • Meta description excerpt (150-160 characters)
+        • Relevant tags for Korean travel, location, activities
+        • Current date
+        • Cover image suggestion
+        
+        TARGET: 1800-2500 words of high-value, shareable travel content that helps readers plan an amazing Korean adventure while building trust and authority.
+        
+        Make this the kind of blog post that travel enthusiasts bookmark and share!
         """
         
         try:
-            message = self.claude_client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=4000,
-                temperature=0.7,
-                messages=[{"role": "user", "content": prompt}]
-            )
+            # Try latest model first, fallback to stable version
+            try:
+                message = self.claude_client.messages.create(
+                    model="claude-3-5-sonnet-20250108",  # Latest model for best writing
+                    max_tokens=4000,
+                    temperature=0.8,  # Slightly higher for more creative writing
+                    messages=[{"role": "user", "content": prompt}]
+                )
+            except:
+                # Fallback to proven stable model
+                message = self.claude_client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=4000,
+                    temperature=0.8,
+                    messages=[{"role": "user", "content": prompt}]
+                )
             
             return message.content[0].text
         except Exception as e:
