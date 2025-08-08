@@ -304,8 +304,13 @@ My recent trip to {self.location_name} was an incredible journey through South K
         output_dir = Path(f"public/images/posts/{slug}")
         output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Process each image
-        for i, photo_path in enumerate(photos_dir.glob("*.{jpg,jpeg,png,JPG,JPEG,PNG}")):
+        # Process each image - search recursively in subdirectories
+        image_extensions = ['*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG']
+        all_images = []
+        for ext in image_extensions:
+            all_images.extend(photos_dir.rglob(ext))  # rglob searches recursively
+        
+        for i, photo_path in enumerate(all_images):
             try:
                 # Open and optimize image
                 with Image.open(photo_path) as img:

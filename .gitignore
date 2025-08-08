@@ -51,3 +51,7 @@ temp/
 # Photo processing temp files
 processed/
 optimized/
+
+# Photo directories - keep photos local only
+photos/
+public/images/posts/*/
