@@ -33,7 +33,7 @@ git push -u origin main
 
 2. **Add Environment Variables in Vercel:**
    ```
-   OPENAI_API_KEY=your_openai_key
+   CLAUDE_API_KEY=your_claude_api_key
    NEXT_PUBLIC_ADSENSE_ID=ca-pub-xxxxxxxxx
    ```
 
@@ -42,7 +42,7 @@ git push -u origin main
 Add these secrets in GitHub repository settings:
 
 ```
-OPENAI_API_KEY=your_openai_key
+CLAUDE_API_KEY=your_claude_api_key
 VERCEL_TOKEN=your_vercel_token
 ORG_ID=your_vercel_org_id  
 PROJECT_ID=your_vercel_project_id
@@ -194,7 +194,7 @@ Your custom content here...
 
 ### Common Issues:
 
-1. **OpenAI API Errors:**
+1. **Claude API Errors:**
    - Check API key validity
    - Ensure sufficient credits
    - Verify rate limits

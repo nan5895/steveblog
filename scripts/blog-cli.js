@@ -223,9 +223,9 @@ class BlogCLI {
         const questions = [
             {
                 type: 'input',
-                name: 'openaiKey',
-                message: 'Enter your OpenAI API key:',
-                validate: (input) => input.trim().length > 0 || 'API key is required'
+                name: 'claudeKey',
+                message: 'Enter your Claude API key:',
+                validate: (input) => input.trim().length > 0 || 'Claude API key is required'
             },
             {
                 type: 'input',
@@ -243,7 +243,7 @@ class BlogCLI {
 
         // Create .env file
         const envContent = `# Korean Travel Blog Configuration
-OPENAI_API_KEY=${answers.openaiKey}
+CLAUDE_API_KEY=${answers.claudeKey}
 NEXT_PUBLIC_ADSENSE_ID=${answers.adsenseId}
 `;
 

@@ -1,5 +1,5 @@
 # Python dependencies for AI blog post generation
-openai>=1.0.0
+anthropic>=0.25.0
 pillow>=10.0.0
 exifread>=3.0.0
 python-dotenv>=1.0.0

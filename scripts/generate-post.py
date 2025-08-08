@@ -14,14 +14,14 @@ from typing import List, Dict, Any
 from PIL import Image
 from PIL.ExifTags import TAGS
 import exifread
-from openai import OpenAI
+import anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class BlogPostGenerator:
     def __init__(self):
-        self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.claude_client = anthropic.Anthropic(api_key=os.getenv('CLAUDE_API_KEY'))
         self.photos_dir = os.getenv('PHOTOS_DIR', 'photos/new-location')
         self.location_name = os.getenv('LOCATION_NAME', 'Korean Adventure')
         self.post_type = os.getenv('POST_TYPE', 'travel-guide')
@@ -68,17 +68,29 @@ class BlogPostGenerator:
         return metadata
     
     def analyze_photos_with_ai(self, photo_paths: List[str]) -> Dict[str, Any]:
-        """Analyze photos using OpenAI Vision API to understand content."""
+        """Analyze photos using Claude Vision API to understand content."""
         
         # Prepare images for analysis
-        image_data = []
-        for photo_path in photo_paths[:6]:  # Limit to 6 photos for API cost
+        image_content = []
+        for photo_path in photo_paths[:8]:  # Claude handles more images efficiently
             try:
                 with open(photo_path, "rb") as image_file:
                     base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-                    image_data.append({
-                        'type': 'image_url',
-                        'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}
+                    
+                    # Determine image format
+                    image_format = "jpeg"
+                    if photo_path.lower().endswith('.png'):
+                        image_format = "png"
+                    elif photo_path.lower().endswith('.webp'):
+                        image_format = "webp"
+                    
+                    image_content.append({
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": f"image/{image_format}",
+                            "data": base64_image
+                        }
                     })
             except Exception as e:
                 print(f"Error processing image {photo_path}: {e}")
@@ -116,25 +128,26 @@ class BlogPostGenerator:
         }}
         
         Focus on Korean travel context, cultural significance, and practical travel tips.
+        Provide authentic insights about Korean culture, food, customs, and travel logistics.
         """
         
         try:
-            response = self.openai_client.chat.completions.create(
-                model="gpt-4-vision-preview",
+            message = self.claude_client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=3000,
                 messages=[
                     {
                         "role": "user",
                         "content": [
                             {"type": "text", "text": prompt}
-                        ] + image_data
+                        ] + image_content
                     }
-                ],
-                max_tokens=2000
+                ]
             )
             
-            return json.loads(response.choices[0].message.content)
+            return json.loads(message.content[0].text)
         except Exception as e:
-            print(f"Error analyzing photos with AI: {e}")
+            print(f"Error analyzing photos with Claude: {e}")
             return self._get_fallback_analysis()
     
     def _get_fallback_analysis(self) -> Dict[str, Any]:
@@ -192,16 +205,16 @@ class BlogPostGenerator:
         """
         
         try:
-            response = self.openai_client.chat.completions.create(
-                model="gpt-4-turbo-preview",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=3000,
-                temperature=0.7
+            message = self.claude_client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=4000,
+                temperature=0.7,
+                messages=[{"role": "user", "content": prompt}]
             )
             
-            return response.choices[0].message.content
+            return message.content[0].text
         except Exception as e:
-            print(f"Error generating blog content: {e}")
+            print(f"Error generating blog content with Claude: {e}")
             return self._get_fallback_content()
     
     def _get_fallback_content(self) -> str:

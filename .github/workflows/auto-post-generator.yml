@@ -46,11 +46,11 @@ jobs:
         
     - name: Install Python dependencies
       run: |
-        pip install pillow exifread openai python-dotenv
+        pip install pillow exifread anthropic python-dotenv
         
     - name: Generate blog post
       env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         PHOTOS_DIR: ${{ github.event.inputs.photos_directory }}
         LOCATION_NAME: ${{ github.event.inputs.location_name }}
         POST_TYPE: ${{ github.event.inputs.post_type }}
